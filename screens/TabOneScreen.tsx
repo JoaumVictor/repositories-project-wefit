@@ -1,15 +1,55 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, FlatList } from "react-native";
 
-import EditScreenInfo from '../components/EditScreenInfo';
-import { Text, View } from '../components/Themed';
-import { RootTabScreenProps } from '../types';
+import { Text, View } from "../components/Themed";
+import { RootTabScreenProps } from "../types";
+import { useEffect } from "react";
+import { getRepositories } from "../services/getRepositories";
+import { useState } from "react";
+import RepoCard from "../components/RepoCard";
+import { IRepo } from "../services/types";
 
-export default function TabOneScreen({ navigation }: RootTabScreenProps<'TabOne'>) {
+export default function TabOneScreen({
+  navigation,
+}: RootTabScreenProps<"TabOne">) {
+  const [loadingRepos, setLoadingRepos] = useState(true);
+  const [failedToLoadRepos, setFailedToLoadRepos] = useState(false);
+  const [repos, setRepos] = useState<IRepo[]>([] as IRepo[]);
+
+  const username = "appswefit";
+
+  const requestRepositories = async () => {
+    try {
+      setLoadingRepos(true);
+      const response = await getRepositories(username);
+      setRepos(response);
+      console.log(response);
+    } catch (error) {
+      setFailedToLoadRepos(true);
+      console.log(error);
+    } finally {
+      setLoadingRepos(false);
+    }
+  };
+
+  useEffect(() => {
+    requestRepositories();
+  }, []);
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Tab One</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="/screens/TabOneScreen.tsx" />
+      {loadingRepos ? (
+        <Text>Carregando...</Text>
+      ) : (
+        <View style={styles.listBox}>
+          <FlatList
+            data={repos}
+            style={styles.list}
+            showsVerticalScrollIndicator={false}
+            keyExtractor={({ id }) => String(id)}
+            renderItem={(item) => <RepoCard repo={item} />}
+          />
+        </View>
+      )}
     </View>
   );
 }
@@ -17,16 +57,16 @@ export default function TabOneScreen({ navigation }: RootTabScreenProps<'TabOne'
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "flex-start",
+    backgroundColor: "#E5E5E5",
   },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
+  listBox: {
+    width: "90%",
+    backgroundColor: "transparent",
+    paddingTop: 20,
   },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
+  list: {
+    width: "100%",
   },
 });
