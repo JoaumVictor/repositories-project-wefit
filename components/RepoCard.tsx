@@ -2,8 +2,9 @@ import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import React, { useContext } from "react";
 import { DataContext } from "../context/DataProvider";
+import { useNavigation } from "@react-navigation/native";
 
-export default function RepoCard({ repo: { item } }: any) {
+export default function RepoCard({ possibleSave, repo: { item } }: any) {
   const {
     full_name,
     description,
@@ -13,7 +14,10 @@ export default function RepoCard({ repo: { item } }: any) {
     // html_url,
   } = item;
 
-  const { addNewRepoInFavorites, setLoadingRepos } = useContext(DataContext);
+  const navigation = useNavigation();
+
+  const { addNewRepoInFavorites, setLoadingRepos, setActualRepo } =
+    useContext(DataContext);
 
   const formatFullNameFromRepo = (name: string) => {
     const nameSplit = name.split("/");
@@ -29,7 +33,12 @@ export default function RepoCard({ repo: { item } }: any) {
     );
   };
 
-  const saveRepo = () => {
+  const handleClickInCard = () => {
+    setActualRepo(item);
+    navigation.navigate("RepoDetails");
+  };
+
+  const saveRepoInFavorites = () => {
     try {
       setLoadingRepos(true);
       const repo: any = {
@@ -48,7 +57,11 @@ export default function RepoCard({ repo: { item } }: any) {
   };
 
   return (
-    <View style={styles.card}>
+    <TouchableOpacity
+      onPress={handleClickInCard}
+      activeOpacity={0.8}
+      style={styles.card}
+    >
       <View style={styles.header}>
         {formatFullNameFromRepo(full_name)}
         <Image style={styles.avatar} source={{ uri: owner.avatar_url }} />
@@ -58,14 +71,16 @@ export default function RepoCard({ repo: { item } }: any) {
         <Text style={styles.description}>{description}</Text>
       </View>
       <View style={styles.bottom}>
-        <TouchableOpacity
-          onPress={saveRepo}
-          style={styles.favorite}
-          activeOpacity={0.6}
-        >
-          <FontAwesome name="star" size={16} color="#FFD700" />
-          <Text style={styles.favoriteText}>Favoritar</Text>
-        </TouchableOpacity>
+        {possibleSave && (
+          <TouchableOpacity
+            onPress={saveRepoInFavorites}
+            style={styles.favorite}
+            activeOpacity={0.6}
+          >
+            <FontAwesome name="star" size={16} color="#FFD700" />
+            <Text style={styles.favoriteText}>Favoritar</Text>
+          </TouchableOpacity>
+        )}
         <View style={styles.star}>
           <FontAwesome name="star" size={24} color="#FFD700" />
           <Text style={styles.starValue}>{stargazers_count}</Text>
@@ -77,7 +92,7 @@ export default function RepoCard({ repo: { item } }: any) {
           </View>
         )}
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 

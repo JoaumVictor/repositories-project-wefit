@@ -13,18 +13,20 @@ import { getRepositories } from "../services/getRepositories";
 import { useState, useContext } from "react";
 import RepoCard from "../components/RepoCard";
 import { IRepo } from "../services/types";
-import {
-  deleteFavoritesFromStorage,
-  deleteUsernameFromStorage,
-} from "../services/storage";
+import { deleteFavoritesFromStorage } from "../services/storage";
 import { DataContext } from "../context/DataProvider";
 
 export default function TabOneScreen({
   navigation,
 }: RootTabScreenProps<"TabOne">) {
   const [repos, setRepos] = useState([] as IRepo[]);
-  const { username, loadingRepos, setLoadingRepos, usernameBox } =
-    useContext(DataContext);
+  const {
+    username,
+    loadingRepos,
+    setLoadingRepos,
+    usernameBox,
+    nameFavoriteRepos,
+  } = useContext(DataContext);
 
   const requestRepositories = async () => {
     try {
@@ -44,9 +46,6 @@ export default function TabOneScreen({
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={deleteFavoritesFromStorage}>
-        <Text>Apagar todos os favoritos</Text>
-      </TouchableOpacity>
       {loadingRepos ? (
         <View style={styles.awaitBox}>
           <ActivityIndicator size="large" color="#edcb44" />
@@ -54,11 +53,13 @@ export default function TabOneScreen({
       ) : (
         <View style={styles.listBox}>
           <FlatList
-            data={repos}
+            data={repos.filter(
+              (repo) => !nameFavoriteRepos.includes(repo.full_name)
+            )}
             style={styles.list}
             showsVerticalScrollIndicator={false}
             keyExtractor={({ full_name }) => full_name}
-            renderItem={(item) => <RepoCard repo={item} />}
+            renderItem={(item) => <RepoCard possibleSave={true} repo={item} />}
           />
         </View>
       )}

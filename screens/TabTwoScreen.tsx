@@ -1,5 +1,5 @@
 import { FlatList } from "native-base";
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useContext } from "react";
 import { StyleSheet } from "react-native";
 
 import RepoCard from "../components/RepoCard";
@@ -65,7 +65,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "flex-start",
     backgroundColor: "#E5E5E5",
-    paddingBottom: 20,
   },
   title: {
     fontSize: 20,
@@ -79,7 +78,6 @@ const styles = StyleSheet.create({
   listBox: {
     width: "90%",
     backgroundColor: "transparent",
-    paddingTop: 20,
   },
   list: {
     width: "100%",

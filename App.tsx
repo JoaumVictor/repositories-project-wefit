@@ -16,14 +16,14 @@ export default function App() {
     return null;
   } else {
     return (
-      <DataProvider>
-        <NativeBaseProvider>
-          <SafeAreaProvider>
+      <SafeAreaProvider>
+        <DataProvider>
+          <NativeBaseProvider>
             <Navigation colorScheme={colorScheme} />
             <StatusBar />
-          </SafeAreaProvider>
-        </NativeBaseProvider>
-      </DataProvider>
+          </NativeBaseProvider>
+        </DataProvider>
+      </SafeAreaProvider>
     );
   }
 }
