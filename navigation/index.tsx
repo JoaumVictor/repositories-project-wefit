@@ -6,10 +6,11 @@ import {
   DarkTheme,
 } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import * as React from "react";
+import React, { useContext } from "react";
 import { ColorSchemeName, Pressable } from "react-native";
 
 import Colors from "../constants/Colors";
+import { DataContext } from "../context/DataProvider";
 import useColorScheme from "../hooks/useColorScheme";
 import ModalScreen from "../screens/ModalScreen";
 import NotFoundScreen from "../screens/NotFoundScreen";
@@ -67,6 +68,7 @@ interface TabBarIconProps {
 
 function BottomTabNavigator() {
   const colorScheme = useColorScheme();
+  const { setUsernameBox } = useContext(DataContext);
 
   return (
     <BottomTab.Navigator
@@ -86,7 +88,7 @@ function BottomTabNavigator() {
           ),
           headerRight: () => (
             <Pressable
-              onPress={() => navigation.navigate("Modal")}
+              onPress={() => setUsernameBox(true)}
               style={({ pressed }) => ({
                 opacity: pressed ? 0.5 : 1,
               })}
@@ -111,7 +113,7 @@ function BottomTabNavigator() {
           ),
           headerRight: () => (
             <Pressable
-              onPress={() => navigation.navigate("Modal")}
+              onPress={() => setUsernameBox(true)}
               style={({ pressed }) => ({
                 opacity: pressed ? 0.5 : 1,
               })}

@@ -1,7 +1,10 @@
 import React, { useState, createContext, useEffect } from "react";
+import { getRepositories } from "../services/getRepositories";
 import {
+  getFavoritesFromStorage,
   getUserFromStorage,
   setFavoritesFromStorage,
+  setUserFromStorage,
 } from "../services/storage";
 import { IRepo } from "../services/types";
 
@@ -20,12 +23,15 @@ export type DataContextT = {
   setLoadingRepos: (condition: boolean) => void;
   addNewRepoInFavorites: (repo: IRepo) => void;
   emptyRepos: boolean;
+  usernameBox: boolean;
+  setUsernameBox: (condition: boolean) => void;
 };
 
 export const DataProvider = ({ children }: providerProps) => {
   const [favorites, setFavorites] = useState([] as IRepo[]);
   const [username, setUsername] = useState("");
   const [loadingRepos, setLoadingRepos] = useState(true);
+  const [usernameBox, setUsernameBox] = useState(false);
 
   const emptyRepos = favorites.length > 0 ? false : true;
 
@@ -53,8 +59,24 @@ export const DataProvider = ({ children }: providerProps) => {
     }
   };
 
+  const requestFavorites = async () => {
+    try {
+      setLoadingRepos(true);
+      const response = await getFavoritesFromStorage();
+      if (response === null) {
+        return setFavorites([]);
+      }
+      setFavorites(JSON.parse(response));
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoadingRepos(false);
+    }
+  };
+
   useEffect(() => {
     requestUserRepo();
+    requestFavorites();
   }, []);
 
   return (
@@ -68,6 +90,8 @@ export const DataProvider = ({ children }: providerProps) => {
         setLoadingRepos,
         emptyRepos,
         addNewRepoInFavorites,
+        usernameBox,
+        setUsernameBox,
       }}
     >
       {children}

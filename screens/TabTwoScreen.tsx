@@ -6,10 +6,17 @@ import RepoCard from "../components/RepoCard";
 import { Text, View } from "../components/Themed";
 import { DataContext } from "../context/DataProvider";
 import { getFavoritesFromStorage } from "../services/storage";
+import ActionSheetSelectUsername from "./ActionSheetSelectUsername";
 
 export default function TabTwoScreen() {
-  const { favorites, setFavorites, loadingRepos, setLoadingRepos, emptyRepos } =
-    useContext(DataContext);
+  const {
+    favorites,
+    setFavorites,
+    loadingRepos,
+    setLoadingRepos,
+    emptyRepos,
+    usernameBox,
+  } = useContext(DataContext);
 
   const awaitRepos = async () => {
     try {
@@ -47,6 +54,7 @@ export default function TabTwoScreen() {
           />
         </View>
       )}
+      {usernameBox && <ActionSheetSelectUsername />}
     </View>
   );
 }

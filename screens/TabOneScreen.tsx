@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 
+import ActionSheetSelectUsername from "./ActionSheetSelectUsername";
 import { Text, View } from "../components/Themed";
 import { RootTabScreenProps } from "../types";
 import { useEffect } from "react";
@@ -15,7 +16,6 @@ import { IRepo } from "../services/types";
 import {
   deleteFavoritesFromStorage,
   deleteUsernameFromStorage,
-  getUserFromStorage,
 } from "../services/storage";
 import { DataContext } from "../context/DataProvider";
 
@@ -23,7 +23,8 @@ export default function TabOneScreen({
   navigation,
 }: RootTabScreenProps<"TabOne">) {
   const [repos, setRepos] = useState([] as IRepo[]);
-  const { username, loadingRepos, setLoadingRepos } = useContext(DataContext);
+  const { username, loadingRepos, setLoadingRepos, usernameBox } =
+    useContext(DataContext);
 
   const requestRepositories = async () => {
     try {
@@ -39,15 +40,12 @@ export default function TabOneScreen({
 
   useEffect(() => {
     requestRepositories();
-  }, []);
+  }, [username]);
 
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={deleteFavoritesFromStorage}>
         <Text>Apagar todos os favoritos</Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={deleteUsernameFromStorage}>
-        <Text>Apagar o username do storage</Text>
       </TouchableOpacity>
       {loadingRepos ? (
         <View style={styles.awaitBox}>
@@ -64,6 +62,7 @@ export default function TabOneScreen({
           />
         </View>
       )}
+      {usernameBox && <ActionSheetSelectUsername />}
     </View>
   );
 }
