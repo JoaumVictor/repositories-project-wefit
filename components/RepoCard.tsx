@@ -1,13 +1,7 @@
-import { View, Text, StyleSheet, Image } from "react-native";
-import React from "react";
-
-// owner.avatar_url
-// full_name,
-// description,
-// owner,
-// stargazers_count,
-// language,
-// html_url,
+import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
+import { FontAwesome } from "@expo/vector-icons";
+import React, { useContext } from "react";
+import { DataContext } from "../context/DataProvider";
 
 export default function RepoCard({ repo: { item } }: any) {
   const {
@@ -16,10 +10,10 @@ export default function RepoCard({ repo: { item } }: any) {
     owner,
     stargazers_count,
     language,
-    html_url,
+    // html_url,
   } = item;
 
-  console.log(description);
+  const { addNewRepoInFavorites, setLoadingRepos } = useContext(DataContext);
 
   const formatFullNameFromRepo = (name: string) => {
     const nameSplit = name.split("/");
@@ -35,6 +29,24 @@ export default function RepoCard({ repo: { item } }: any) {
     );
   };
 
+  const saveRepo = () => {
+    try {
+      setLoadingRepos(true);
+      const repo: any = {
+        full_name,
+        description,
+        owner,
+        stargazers_count,
+        language,
+      };
+      addNewRepoInFavorites(repo);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoadingRepos(false);
+    }
+  };
+
   return (
     <View style={styles.card}>
       <View style={styles.header}>
@@ -45,7 +57,26 @@ export default function RepoCard({ repo: { item } }: any) {
       <View style={styles.middle}>
         <Text style={styles.description}>{description}</Text>
       </View>
-      <View style={styles.bottom}></View>
+      <View style={styles.bottom}>
+        <TouchableOpacity
+          onPress={saveRepo}
+          style={styles.favorite}
+          activeOpacity={0.6}
+        >
+          <FontAwesome name="star" size={16} color="#FFD700" />
+          <Text style={styles.favoriteText}>Favoritar</Text>
+        </TouchableOpacity>
+        <View style={styles.star}>
+          <FontAwesome name="star" size={24} color="#FFD700" />
+          <Text style={styles.starValue}>{stargazers_count}</Text>
+        </View>
+        {language && (
+          <View style={styles.language}>
+            <View style={styles.point} />
+            <Text>{language}</Text>
+          </View>
+        )}
+      </View>
     </View>
   );
 }
@@ -59,6 +90,7 @@ const styles = StyleSheet.create({
     height: 200,
     padding: 10,
     marginBottom: 20,
+    marginTop: 10,
   },
   header: {
     flexDirection: "row",
@@ -93,7 +125,9 @@ const styles = StyleSheet.create({
   },
   middle: {
     width: "100%",
-    height: "50%",
+    height: "40%",
+    justifyContent: "center",
+    alignItems: "flex-start",
   },
   description: {
     fontSize: 16,
@@ -102,5 +136,45 @@ const styles = StyleSheet.create({
   bottom: {
     width: "100%",
     height: "25%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    flexWrap: "nowrap",
+  },
+  favorite: {
+    height: 40,
+    backgroundColor: "#FAF3DC",
+    borderRadius: 6,
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "row",
+    width: "33%",
+  },
+  favoriteText: {
+    color: "rgba(255, 208, 44, 1)",
+    fontSize: 14,
+    marginLeft: 5,
+  },
+  star: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "30%",
+  },
+  starValue: {
+    fontSize: 16,
+    marginLeft: 5,
+  },
+  language: {
+    flexDirection: "row",
+    alignItems: "center",
+    width: "30%",
+  },
+  point: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: "#ff2c2c",
+    marginRight: 5,
   },
 });

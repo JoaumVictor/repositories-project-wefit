@@ -1,5 +1,5 @@
 import api from "./api";
-import { IData, IRepo } from "./types";
+import { IData } from "./types";
 
 export const getRepositories = async (username: string) => {
   const { data }: IData = await api.get(`/${username}/repos`);

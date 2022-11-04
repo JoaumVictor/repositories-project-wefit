@@ -1,30 +1,36 @@
-import { StyleSheet, FlatList } from "react-native";
+import {
+  StyleSheet,
+  FlatList,
+  ActivityIndicator,
+  TouchableOpacity,
+} from "react-native";
 
 import { Text, View } from "../components/Themed";
 import { RootTabScreenProps } from "../types";
 import { useEffect } from "react";
 import { getRepositories } from "../services/getRepositories";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import RepoCard from "../components/RepoCard";
 import { IRepo } from "../services/types";
+import {
+  deleteFavoritesFromStorage,
+  deleteUsernameFromStorage,
+  getUserFromStorage,
+} from "../services/storage";
+import { DataContext } from "../context/DataProvider";
 
 export default function TabOneScreen({
   navigation,
 }: RootTabScreenProps<"TabOne">) {
-  const [loadingRepos, setLoadingRepos] = useState(true);
-  const [failedToLoadRepos, setFailedToLoadRepos] = useState(false);
-  const [repos, setRepos] = useState<IRepo[]>([] as IRepo[]);
-
-  const username = "appswefit";
+  const [repos, setRepos] = useState([] as IRepo[]);
+  const { username, loadingRepos, setLoadingRepos } = useContext(DataContext);
 
   const requestRepositories = async () => {
     try {
       setLoadingRepos(true);
       const response = await getRepositories(username);
       setRepos(response);
-      console.log(response);
     } catch (error) {
-      setFailedToLoadRepos(true);
       console.log(error);
     } finally {
       setLoadingRepos(false);
@@ -37,15 +43,23 @@ export default function TabOneScreen({
 
   return (
     <View style={styles.container}>
+      <TouchableOpacity onPress={deleteFavoritesFromStorage}>
+        <Text>Apagar todos os favoritos</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={deleteUsernameFromStorage}>
+        <Text>Apagar o username do storage</Text>
+      </TouchableOpacity>
       {loadingRepos ? (
-        <Text>Carregando...</Text>
+        <View style={styles.awaitBox}>
+          <ActivityIndicator size="large" color="#edcb44" />
+        </View>
       ) : (
         <View style={styles.listBox}>
           <FlatList
             data={repos}
             style={styles.list}
             showsVerticalScrollIndicator={false}
-            keyExtractor={({ id }) => String(id)}
+            keyExtractor={({ full_name }) => full_name}
             renderItem={(item) => <RepoCard repo={item} />}
           />
         </View>
@@ -60,6 +74,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "flex-start",
     backgroundColor: "#E5E5E5",
+    paddingBottom: 20,
+  },
+  awaitBox: {
+    height: "100%",
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  errorBox: {
+    alignItems: "center",
+    justifyContent: "center",
   },
   listBox: {
     width: "90%",
@@ -68,5 +93,9 @@ const styles = StyleSheet.create({
   },
   list: {
     width: "100%",
+  },
+  awaitImage: {
+    width: 220,
+    height: 220,
   },
 });
