@@ -1,12 +1,24 @@
-import { FlatList } from "native-base";
 import { useEffect, useContext } from "react";
-import { StyleSheet, ActivityIndicator, Image } from "react-native";
+import { StyleSheet, ActivityIndicator, Image, Alert } from "react-native";
+import { FlatList } from "native-base";
 
 import RepoCard from "../components/RepoCard";
 import { Text, View } from "../components/Themed";
 import { DataContext } from "../context/DataProvider";
 import { getFavoritesFromStorage } from "../services/storage";
 import ActionSheetSelectUsername from "./ActionSheetSelectUsername";
+
+const EmptyRepos = () => {
+  return (
+    <View style={styles.empty}>
+      <Image
+        style={styles.image}
+        source={require("../assets/monkeyError.png")}
+      />
+      <Text style={styles.emptyText}>Nenhum repositório favoritado!</Text>
+    </View>
+  );
+};
 
 export default function TabTwoScreen() {
   const {
@@ -28,7 +40,7 @@ export default function TabTwoScreen() {
         setFavorites([]);
       }
     } catch (error) {
-      console.log(error);
+      Alert.alert("Opss", "Erro ao carregar seus repositórios!");
     } finally {
       setLoadingRepos(false);
     }
@@ -40,15 +52,7 @@ export default function TabTwoScreen() {
 
   return (
     <View style={styles.container}>
-      {emptyRepos && (
-        <View style={styles.empty}>
-          <Image
-            style={styles.image}
-            source={require("../assets/monkeyError.png")}
-          />
-          <Text style={styles.emptyText}>Nenhum repositório encontrado!</Text>
-        </View>
-      )}
+      {emptyRepos && <EmptyRepos />}
       {loadingRepos ? (
         <View style={styles.awaitBox}>
           <ActivityIndicator size={50} color="#edcb44" />

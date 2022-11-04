@@ -1,20 +1,41 @@
-import { StyleSheet, FlatList, ActivityIndicator, Image } from "react-native";
+import { useEffect, useState, useContext } from "react";
+import {
+  StyleSheet,
+  FlatList,
+  ActivityIndicator,
+  Image,
+  Alert,
+} from "react-native";
+import NetInfo from "@react-native-community/netinfo";
 
-import ActionSheetSelectUsername from "./ActionSheetSelectUsername";
+import RepoCard from "../components/RepoCard";
 import { Text, View } from "../components/Themed";
 import { RootTabScreenProps } from "../types";
-import { useEffect } from "react";
 import { getRepositories } from "../services/getRepositories";
-import { useState, useContext } from "react";
-import RepoCard from "../components/RepoCard";
 import { IRepo } from "../services/types";
 import { DataContext } from "../context/DataProvider";
-import NetInfo from "@react-native-community/netinfo";
+import ActionSheetSelectUsername from "./ActionSheetSelectUsername";
+
+const NoSignal = () => {
+  return (
+    <View style={styles.noSignal}>
+      <Image
+        style={styles.image}
+        source={require("../assets/monkeyError.png")}
+      />
+      <Text style={styles.noSignalText}>Opss, algo deu errado.</Text>
+      <Text style={styles.noSignalText}>
+        Verifique sua conexão com a internet!
+      </Text>
+    </View>
+  );
+};
 
 export default function TabOneScreen({
   navigation,
 }: RootTabScreenProps<"TabOne">) {
   const [repos, setRepos] = useState([] as IRepo[]);
+  const [infoNet, setInfoNet] = useState(true);
   const {
     username,
     loadingRepos,
@@ -23,23 +44,27 @@ export default function TabOneScreen({
     nameFavoriteRepos,
   } = useContext(DataContext);
 
-  const [infoNet, setInfoNet] = useState(true);
-
-  const handleGetNetInfo = async () => {
-    NetInfo.fetch().then((state: any) => {
-      console.log("Internet connection?", state.isConnected);
-      setInfoNet(state.isConnected);
+  const handleGetNetInfo = async (): Promise<void> => {
+    await NetInfo.fetch().then((state) => {
+      if (state.isConnected) {
+        setInfoNet(state.isConnected);
+      } else {
+        setInfoNet(false);
+      }
     });
   };
 
   const requestRepositories = async () => {
     try {
       setLoadingRepos(true);
-      handleGetNetInfo;
+      handleGetNetInfo();
       const response = await getRepositories(username);
       setRepos(response);
     } catch (error) {
-      console.log(error);
+      Alert.alert(
+        "Opss",
+        "Algo deu errado ao tentar carregar os repositórios!"
+      );
     } finally {
       setLoadingRepos(false);
     }
@@ -72,16 +97,7 @@ export default function TabOneScreen({
               />
             </View>
           ) : (
-            <View style={styles.noSignal}>
-              <Image
-                style={styles.image}
-                source={require("../assets/monkeyError.png")}
-              />
-              <Text style={styles.noSignalText}>Opss, algo deu errado.</Text>
-              <Text style={styles.noSignalText}>
-                Verifique sua conexão com a internet!
-              </Text>
-            </View>
+            <NoSignal />
           )}
         </View>
       )}

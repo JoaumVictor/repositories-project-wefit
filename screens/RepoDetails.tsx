@@ -1,9 +1,9 @@
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import React, { useContext, useState, useEffect } from "react";
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { WebView } from "react-native-webview";
+import { FontAwesome } from "@expo/vector-icons";
 
 import { DataContext } from "../context/DataProvider";
-import { FontAwesome } from "@expo/vector-icons";
 
 export default function RepoDetails() {
   const {
@@ -13,18 +13,9 @@ export default function RepoDetails() {
     setLoadingRepos,
     addNewRepoInFavorites,
   } = useContext(DataContext);
-
   const [goUrl, setGoUrl] = useState(false);
   const [url, setUrl] = useState("");
-
-  const {
-    full_name,
-    description,
-    owner,
-    stargazers_count,
-    language,
-    html_url,
-  } = actualRepo;
+  const { full_name, description, language, html_url } = actualRepo;
 
   useEffect(() => {
     setUrl(html_url);
@@ -35,7 +26,7 @@ export default function RepoDetails() {
       setLoadingRepos(true);
       addNewRepoInFavorites(actualRepo);
     } catch (error) {
-      console.log(error);
+      Alert.alert("Opss", "Erro ao salvar o repositório");
     } finally {
       setLoadingRepos(false);
     }
@@ -43,7 +34,6 @@ export default function RepoDetails() {
 
   const formatFullNameFromRepo = (name: string) => {
     const nameSplit = name.split("/");
-
     return (
       <View style={styles.fullName}>
         <Text style={styles.repoName}>{nameSplit[0]}/</Text>
@@ -53,17 +43,10 @@ export default function RepoDetails() {
   };
 
   if (goUrl) {
-    return (
-      <WebView
-        source={{ uri: url }}
-        style={{ marginTop: 20 }}
-        // onLoad={() => setGoUrl(false)}
-      />
-    );
+    return <WebView source={{ uri: url }} style={{ marginTop: 20 }} />;
   } else {
     return (
       <View style={styles.container}>
-        {goUrl && <View></View>}
         <View style={styles.box}>
           {formatFullNameFromRepo(full_name)}
           <Text style={styles.gray}>{description}</Text>
@@ -147,7 +130,7 @@ const styles = StyleSheet.create({
   gray: {
     color: "rgba(154, 154, 154, 1)",
     fontSize: 16,
-    marginTop: 10,
+    marginVertical: 20,
   },
   language: {
     flexDirection: "row",

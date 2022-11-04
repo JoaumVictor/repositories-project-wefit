@@ -35,23 +35,19 @@ export const DataProvider = ({ children }: providerProps) => {
   const [loadingRepos, setLoadingRepos] = useState(true);
   const [usernameBox, setUsernameBox] = useState(false);
   const [actualRepo, setActualRepo] = useState({} as IRepo);
-
   const emptyRepos = favorites.length > 0 ? false : true;
-
   const nameFavoriteRepos = favorites.map((repo) => repo.full_name);
-
   const addNewRepoInFavorites = (obj: IRepo) => {
     try {
       setLoadingRepos(true);
       setFavorites([...favorites, obj]);
       setFavoritesFromStorage(JSON.stringify([...favorites, obj]));
     } catch (error) {
-      console.log(error);
+      console.warn(error);
     } finally {
       setLoadingRepos(false);
     }
   };
-
   const removeRepoInFavorites = (full_name: string) => {
     try {
       setLoadingRepos(true);
@@ -61,12 +57,11 @@ export const DataProvider = ({ children }: providerProps) => {
       setFavorites(newFavorites);
       setFavoritesFromStorage(JSON.stringify(newFavorites));
     } catch (error) {
-      console.log(error);
+      console.warn(error);
     } finally {
       setLoadingRepos(false);
     }
   };
-
   const requestUserRepo = async () => {
     try {
       const response = await getUserFromStorage();
@@ -75,10 +70,9 @@ export const DataProvider = ({ children }: providerProps) => {
       }
       setUsername(response);
     } catch (error) {
-      console.log(error);
+      console.warn(error);
     }
   };
-
   const requestFavorites = async () => {
     try {
       setLoadingRepos(true);
@@ -88,17 +82,15 @@ export const DataProvider = ({ children }: providerProps) => {
       }
       setFavorites(JSON.parse(response));
     } catch (error) {
-      console.log(error);
+      console.warn(error);
     } finally {
       setLoadingRepos(false);
     }
   };
-
   useEffect(() => {
     requestUserRepo();
     requestFavorites();
   }, []);
-
   return (
     <DataContext.Provider
       value={{
