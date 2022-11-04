@@ -59,7 +59,6 @@ function RootNavigator() {
         component={RepoDetails}
         options={{ title: "Detalhes", navigationBarColor: "#000" }}
       />
-
       <Stack.Group screenOptions={{ presentation: "modal" }}>
         <Stack.Screen name="Modal" component={ModalScreen} />
       </Stack.Group>
@@ -143,5 +142,5 @@ function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>["name"];
   color: string;
 }) {
-  return <FontAwesome size={30} style={{ marginBottom: -3 }} {...props} />;
+  return <FontAwesome size={24} style={{ marginBottom: -5 }} {...props} />;
 }

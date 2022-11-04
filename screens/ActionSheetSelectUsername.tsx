@@ -1,16 +1,15 @@
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import React, { useContext, useEffect } from "react";
-import { DataContext } from "../context/DataProvider";
+import React, { useContext, useEffect, useState } from "react";
 import { TextInput } from "react-native-paper";
+
+import { DataContext } from "../context/DataProvider";
 import { setUserFromStorage } from "../services/storage";
 
 export default function ActionSheetSelectUsername() {
   const { setUsername, username, setUsernameBox } = useContext(DataContext);
-  const [text, setText] = React.useState("");
+  const [text, setText] = useState("");
 
-  useEffect(() => {
-    setText(username);
-  }, []);
+  useEffect(() => setText(username), []);
 
   return (
     <View style={styles.shadow}>
@@ -20,7 +19,10 @@ export default function ActionSheetSelectUsername() {
         <TextInput
           label="Usuário"
           style={styles.input}
+          outlineStyle={{ borderColor: "#edcb44" }}
           value={text}
+          outlineColor="#000000"
+          keyboardAppearance="dark"
           onChangeText={(text) => setText(text)}
         />
         <View style={styles.bottomBox}>
@@ -89,6 +91,8 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 50,
     marginVertical: 15,
+    backgroundColor: "#f1f1f1",
+    color: "#000000",
   },
   bottomBox: {
     width: "100%",

@@ -123,7 +123,6 @@ const styles = StyleSheet.create({
     height: "100%",
     backgroundColor: "#E5E5E5",
     paddingHorizontal: 20,
-    paddingBottom: 30,
   },
   errorBox: {
     alignItems: "center",
@@ -132,7 +131,7 @@ const styles = StyleSheet.create({
   listBox: {
     width: "100%",
     backgroundColor: "transparent",
-    paddingTop: 20,
+    height: "100%",
   },
   list: {
     width: "100%",
