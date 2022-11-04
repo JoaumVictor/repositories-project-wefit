@@ -1,5 +1,7 @@
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import React, { useContext } from "react";
+import React, { useContext, useState, useEffect } from "react";
+import { WebView } from "react-native-webview";
+
 import { DataContext } from "../context/DataProvider";
 import { FontAwesome } from "@expo/vector-icons";
 
@@ -12,26 +14,26 @@ export default function RepoDetails() {
     addNewRepoInFavorites,
   } = useContext(DataContext);
 
+  const [goUrl, setGoUrl] = useState(false);
+  const [url, setUrl] = useState("");
+
   const {
     full_name,
     description,
     owner,
     stargazers_count,
     language,
-    // html_url,
+    html_url,
   } = actualRepo;
+
+  useEffect(() => {
+    setUrl(html_url);
+  }, [html_url]);
 
   const saveRepoInFavorites = () => {
     try {
       setLoadingRepos(true);
-      const repo: any = {
-        full_name,
-        description,
-        owner,
-        stargazers_count,
-        language,
-      };
-      addNewRepoInFavorites(repo);
+      addNewRepoInFavorites(actualRepo);
     } catch (error) {
       console.log(error);
     } finally {
@@ -50,52 +52,67 @@ export default function RepoDetails() {
     );
   };
 
-  return (
-    <View style={styles.container}>
-      <View style={styles.box}>
-        {formatFullNameFromRepo(full_name)}
-        <Text style={styles.gray}>{description}</Text>
-        <Text style={styles.gray}>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce porta
-          magna sit amet ante faucibus sodales. Ut tempor massa risus, vel
-          consectetur diam efficitur in. Suspendisse ut enim augue. Donec
-          ullamcorper odio in tellus feugiat venenatis. Phasellus eleifend nisl
-          neque, a pulvinar nisl mattis ac. Phasellus vitae velit eu dui tempus
-          ullamcorper eget ut metus. Proin vestibulum sodales justo, vitae
-          iaculis ipsum volutpat a. Nam vel leo vitae leo volutpat varius.
-        </Text>
-        {language && (
-          <View style={styles.language}>
-            <View style={styles.point} />
-            <Text>{language}</Text>
-          </View>
-        )}
-      </View>
-      <View style={styles.bottomBox}>
-        <TouchableOpacity style={styles.repositoryButton}>
-          <Text style={styles.repositoryButtonText}>VER REPOSITÓRIO</Text>
-          <FontAwesome name="link" size={20} color="rgba(25, 118, 210, 1)" />
-        </TouchableOpacity>
-        {nameFavoriteRepos.includes(full_name) ? (
+  if (goUrl) {
+    return (
+      <WebView
+        source={{ uri: url }}
+        style={{ marginTop: 20 }}
+        // onLoad={() => setGoUrl(false)}
+      />
+    );
+  } else {
+    return (
+      <View style={styles.container}>
+        {goUrl && <View></View>}
+        <View style={styles.box}>
+          {formatFullNameFromRepo(full_name)}
+          <Text style={styles.gray}>{description}</Text>
+          <Text style={styles.gray}>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce porta
+            magna sit amet ante faucibus sodales. Ut tempor massa risus, vel
+            consectetur diam efficitur in. Suspendisse ut enim augue. Donec
+            ullamcorper odio in tellus feugiat venenatis. Phasellus eleifend
+            nisl neque, a pulvinar nisl mattis ac. Phasellus vitae velit eu dui
+            tempus ullamcorper eget ut metus. Proin vestibulum sodales justo,
+            vitae iaculis ipsum volutpat a. Nam vel leo vitae leo volutpat
+            varius.
+          </Text>
+          {language && (
+            <View style={styles.language}>
+              <View style={styles.point} />
+              <Text>{language}</Text>
+            </View>
+          )}
+        </View>
+        <View style={styles.bottomBox}>
           <TouchableOpacity
-            onPress={() => removeRepoInFavorites(full_name)}
-            style={styles.unfavoriteButton}
+            onPress={() => setGoUrl(true)}
+            style={styles.repositoryButton}
           >
-            <Text style={styles.favoriteButtonText}>DESFAVORITAR</Text>
-            <FontAwesome name="star-o" size={24} color="#000000" />
+            <Text style={styles.repositoryButtonText}>VER REPOSITÓRIO</Text>
+            <FontAwesome name="link" size={20} color="rgba(25, 118, 210, 1)" />
           </TouchableOpacity>
-        ) : (
-          <TouchableOpacity
-            onPress={saveRepoInFavorites}
-            style={styles.favoriteButton}
-          >
-            <Text style={styles.favoriteButtonText}>FAVORITAR</Text>
-            <FontAwesome name="star-o" size={24} color="#000000" />
-          </TouchableOpacity>
-        )}
+          {nameFavoriteRepos.includes(full_name) ? (
+            <TouchableOpacity
+              onPress={() => removeRepoInFavorites(full_name)}
+              style={styles.unfavoriteButton}
+            >
+              <Text style={styles.favoriteButtonText}>DESFAVORITAR</Text>
+              <FontAwesome name="star-o" size={24} color="#000000" />
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              onPress={saveRepoInFavorites}
+              style={styles.favoriteButton}
+            >
+              <Text style={styles.favoriteButtonText}>FAVORITAR</Text>
+              <FontAwesome name="star-o" size={24} color="#000000" />
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
-    </View>
-  );
+    );
+  }
 }
 
 const styles = StyleSheet.create({

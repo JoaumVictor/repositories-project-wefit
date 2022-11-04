@@ -11,7 +11,7 @@ export default function RepoCard({ possibleSave, repo: { item } }: any) {
     owner,
     stargazers_count,
     language,
-    // html_url,
+    html_url,
   } = item;
 
   const navigation = useNavigation();
@@ -41,14 +41,7 @@ export default function RepoCard({ possibleSave, repo: { item } }: any) {
   const saveRepoInFavorites = () => {
     try {
       setLoadingRepos(true);
-      const repo: any = {
-        full_name,
-        description,
-        owner,
-        stargazers_count,
-        language,
-      };
-      addNewRepoInFavorites(repo);
+      addNewRepoInFavorites(item);
     } catch (error) {
       console.log(error);
     } finally {

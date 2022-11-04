@@ -1,10 +1,8 @@
 import React, { useState, createContext, useEffect } from "react";
-import { getRepositories } from "../services/getRepositories";
 import {
   getFavoritesFromStorage,
   getUserFromStorage,
   setFavoritesFromStorage,
-  deleteFavoritesFromStorage,
 } from "../services/storage";
 import { IRepo } from "../services/types";
 
@@ -97,11 +95,6 @@ export const DataProvider = ({ children }: providerProps) => {
       setLoadingRepos(false);
     }
   };
-
-  // const updateAll = () => {
-  //   requestUserRepo();
-  //   requestFavorites();
-  // };
 
   useEffect(() => {
     requestUserRepo();
