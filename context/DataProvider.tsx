@@ -44,7 +44,6 @@ export const DataProvider = ({ children }: providerProps) => {
     try {
       setLoadingRepos(true);
       setFavorites([...favorites, obj]);
-      console.log(JSON.stringify([...favorites, obj]));
       setFavoritesFromStorage(JSON.stringify([...favorites, obj]));
     } catch (error) {
       console.log(error);
@@ -84,7 +83,6 @@ export const DataProvider = ({ children }: providerProps) => {
     try {
       setLoadingRepos(true);
       const response = await getFavoritesFromStorage();
-      console.log(response);
       if (response === null) {
         return setFavorites([]);
       }

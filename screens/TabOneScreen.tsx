@@ -1,9 +1,4 @@
-import {
-  StyleSheet,
-  FlatList,
-  ActivityIndicator,
-  TouchableOpacity,
-} from "react-native";
+import { StyleSheet, FlatList, ActivityIndicator, Image } from "react-native";
 
 import ActionSheetSelectUsername from "./ActionSheetSelectUsername";
 import { Text, View } from "../components/Themed";
@@ -13,8 +8,8 @@ import { getRepositories } from "../services/getRepositories";
 import { useState, useContext } from "react";
 import RepoCard from "../components/RepoCard";
 import { IRepo } from "../services/types";
-import { deleteFavoritesFromStorage } from "../services/storage";
 import { DataContext } from "../context/DataProvider";
+import NetInfo from "@react-native-community/netinfo";
 
 export default function TabOneScreen({
   navigation,
@@ -28,9 +23,19 @@ export default function TabOneScreen({
     nameFavoriteRepos,
   } = useContext(DataContext);
 
+  const [infoNet, setInfoNet] = useState(true);
+
+  const handleGetNetInfo = async () => {
+    NetInfo.fetch().then((state: any) => {
+      console.log("Internet connection?", state.isConnected);
+      setInfoNet(state.isConnected);
+    });
+  };
+
   const requestRepositories = async () => {
     try {
       setLoadingRepos(true);
+      handleGetNetInfo;
       const response = await getRepositories(username);
       setRepos(response);
     } catch (error) {
@@ -48,19 +53,36 @@ export default function TabOneScreen({
     <View style={styles.container}>
       {loadingRepos ? (
         <View style={styles.awaitBox}>
-          <ActivityIndicator size="large" color="#edcb44" />
+          <ActivityIndicator size={50} color="#edcb44" />
         </View>
       ) : (
-        <View style={styles.listBox}>
-          <FlatList
-            data={repos.filter(
-              (repo) => !nameFavoriteRepos.includes(repo.full_name)
-            )}
-            style={styles.list}
-            showsVerticalScrollIndicator={false}
-            keyExtractor={({ full_name }) => full_name}
-            renderItem={(item) => <RepoCard possibleSave={true} repo={item} />}
-          />
+        <View style={styles.content}>
+          {infoNet ? (
+            <View style={styles.listBox}>
+              <FlatList
+                data={repos.filter(
+                  (repo) => !nameFavoriteRepos.includes(repo.full_name)
+                )}
+                style={styles.list}
+                showsVerticalScrollIndicator={false}
+                keyExtractor={({ full_name }) => full_name}
+                renderItem={(item) => (
+                  <RepoCard possibleSave={true} repo={item} />
+                )}
+              />
+            </View>
+          ) : (
+            <View style={styles.noSignal}>
+              <Image
+                style={styles.image}
+                source={require("../assets/monkeyError.png")}
+              />
+              <Text style={styles.noSignalText}>Opss, algo deu errado.</Text>
+              <Text style={styles.noSignalText}>
+                Verifique sua conexão com a internet!
+              </Text>
+            </View>
+          )}
         </View>
       )}
       {usernameBox && <ActionSheetSelectUsername />}
@@ -74,20 +96,41 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "flex-start",
     backgroundColor: "#E5E5E5",
-    paddingBottom: 20,
   },
-  awaitBox: {
-    height: "100%",
+  noSignal: {
+    height: "105%",
     width: "100%",
     alignItems: "center",
     justifyContent: "center",
+    backgroundColor: "#ffffff",
+  },
+  noSignalText: {
+    fontSize: 18,
+  },
+  image: {
+    width: 200,
+    height: 200,
+    marginBottom: 20,
+  },
+  awaitBox: {
+    height: "105%",
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  content: {
+    width: "100%",
+    height: "100%",
+    backgroundColor: "#E5E5E5",
+    paddingHorizontal: 20,
+    paddingBottom: 30,
   },
   errorBox: {
     alignItems: "center",
     justifyContent: "center",
   },
   listBox: {
-    width: "90%",
+    width: "100%",
     backgroundColor: "transparent",
     paddingTop: 20,
   },

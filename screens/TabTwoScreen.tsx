@@ -1,6 +1,6 @@
 import { FlatList } from "native-base";
 import { useEffect, useContext } from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, ActivityIndicator } from "react-native";
 
 import RepoCard from "../components/RepoCard";
 import { Text, View } from "../components/Themed";
@@ -42,7 +42,9 @@ export default function TabTwoScreen() {
     <View style={styles.container}>
       {emptyRepos && <Text>Nenhum repositório favoritado</Text>}
       {loadingRepos ? (
-        <Text>Carregando...</Text>
+        <View style={styles.awaitBox}>
+          <ActivityIndicator size={50} color="#edcb44" />
+        </View>
       ) : (
         <View style={styles.listBox}>
           <FlatList
@@ -65,6 +67,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "flex-start",
     backgroundColor: "#E5E5E5",
+  },
+  awaitBox: {
+    height: "105%",
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
   },
   title: {
     fontSize: 20,
